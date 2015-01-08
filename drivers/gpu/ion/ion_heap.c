@@ -16,6 +16,7 @@
 
 #include <linux/err.h>
 #include <linux/ion.h>
+<<<<<<< HEAD
 #include <linux/mm.h>
 #include <linux/scatterlist.h>
 #include <linux/vmalloc.h>
@@ -130,6 +131,10 @@ end:
 	return ret;
 }
 
+=======
+#include "ion_priv.h"
+
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 struct ion_heap *ion_heap_create(struct ion_platform_heap *heap_data)
 {
 	struct ion_heap *heap = NULL;
@@ -144,9 +149,12 @@ struct ion_heap *ion_heap_create(struct ion_platform_heap *heap_data)
 	case ION_HEAP_TYPE_CARVEOUT:
 		heap = ion_carveout_heap_create(heap_data);
 		break;
+<<<<<<< HEAD
 	case ION_HEAP_TYPE_CHUNK:
 		heap = ion_chunk_heap_create(heap_data);
 		break;
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 	default:
 		pr_err("%s: Invalid heap type %d\n", __func__,
 		       heap_data->type);
@@ -180,9 +188,12 @@ void ion_heap_destroy(struct ion_heap *heap)
 	case ION_HEAP_TYPE_CARVEOUT:
 		ion_carveout_heap_destroy(heap);
 		break;
+<<<<<<< HEAD
 	case ION_HEAP_TYPE_CHUNK:
 		ion_chunk_heap_destroy(heap);
 		break;
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 	default:
 		pr_err("%s: Invalid heap type %d\n", __func__,
 		       heap->type);

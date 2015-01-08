@@ -84,6 +84,7 @@ static void ion_carveout_heap_free(struct ion_buffer *buffer)
 	buffer->priv_phys = ION_CARVEOUT_ALLOCATE_FAIL;
 }
 
+<<<<<<< HEAD
 struct sg_table *ion_carveout_heap_map_dma(struct ion_heap *heap,
 					      struct ion_buffer *buffer)
 {
@@ -101,17 +102,28 @@ struct sg_table *ion_carveout_heap_map_dma(struct ion_heap *heap,
 	sg_set_page(table->sgl, phys_to_page(buffer->priv_phys), buffer->size,
 		    0);
 	return table;
+=======
+struct scatterlist *ion_carveout_heap_map_dma(struct ion_heap *heap,
+					      struct ion_buffer *buffer)
+{
+	return ERR_PTR(-EINVAL);
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 }
 
 void ion_carveout_heap_unmap_dma(struct ion_heap *heap,
 				 struct ion_buffer *buffer)
 {
+<<<<<<< HEAD
 	sg_free_table(buffer->sg_table);
+=======
+	return;
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 }
 
 void *ion_carveout_heap_map_kernel(struct ion_heap *heap,
 				   struct ion_buffer *buffer)
 {
+<<<<<<< HEAD
 	int mtype = MT_MEMORY_NONCACHED;
 
 	if (buffer->flags & ION_FLAG_CACHED)
@@ -119,6 +131,10 @@ void *ion_carveout_heap_map_kernel(struct ion_heap *heap,
 
 	return __arch_ioremap(buffer->priv_phys, buffer->size,
 			      mtype);
+=======
+	return __arch_ioremap(buffer->priv_phys, buffer->size,
+			      MT_MEMORY_NONCACHED);
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 }
 
 void ion_carveout_heap_unmap_kernel(struct ion_heap *heap,
@@ -134,7 +150,11 @@ int ion_carveout_heap_map_user(struct ion_heap *heap, struct ion_buffer *buffer,
 {
 	return remap_pfn_range(vma, vma->vm_start,
 			       __phys_to_pfn(buffer->priv_phys) + vma->vm_pgoff,
+<<<<<<< HEAD
 			       vma->vm_end - vma->vm_start,
+=======
+			       buffer->size,
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 			       pgprot_noncached(vma->vm_page_prot));
 }
 
@@ -142,8 +162,11 @@ static struct ion_heap_ops carveout_heap_ops = {
 	.allocate = ion_carveout_heap_allocate,
 	.free = ion_carveout_heap_free,
 	.phys = ion_carveout_heap_phys,
+<<<<<<< HEAD
 	.map_dma = ion_carveout_heap_map_dma,
 	.unmap_dma = ion_carveout_heap_unmap_dma,
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 	.map_user = ion_carveout_heap_map_user,
 	.map_kernel = ion_carveout_heap_map_kernel,
 	.unmap_kernel = ion_carveout_heap_unmap_kernel,

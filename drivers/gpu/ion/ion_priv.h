@@ -17,14 +17,33 @@
 #ifndef _ION_PRIV_H
 #define _ION_PRIV_H
 
+<<<<<<< HEAD
 #include <linux/ion.h>
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 #include <linux/kref.h>
 #include <linux/mm_types.h>
 #include <linux/mutex.h>
 #include <linux/rbtree.h>
+<<<<<<< HEAD
 #include <linux/sched.h>
 #include <linux/mm.h>
 #include <linux/types.h>
+=======
+#include <linux/ion.h>
+
+struct ion_mapping;
+
+struct ion_dma_mapping {
+	struct kref ref;
+	struct scatterlist *sglist;
+};
+
+struct ion_kernel_mapping {
+	struct kref ref;
+	void *vaddr;
+};
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 
 struct ion_buffer *ion_handle_buffer(struct ion_handle *handle);
 
@@ -44,6 +63,7 @@ struct ion_buffer *ion_handle_buffer(struct ion_handle *handle);
  * @kmap_cnt:		number of times the buffer is mapped to the kernel
  * @vaddr:		the kenrel mapping if kmap_cnt is not zero
  * @dmap_cnt:		number of times the buffer is mapped for dma
+<<<<<<< HEAD
  * @sg_table:		the sg table for the buffer if dmap_cnt is not zero
  * @dirty:		bitmask representing which pages of this buffer have
  *			been dirtied by the cpu and need cache maintenance
@@ -61,6 +81,13 @@ struct ion_buffer {
 		struct rb_node node;
 		struct list_head list;
 	};
+=======
+ * @sglist:		the scatterlist for the buffer is dmap_cnt is not zero
+*/
+struct ion_buffer {
+	struct kref ref;
+	struct rb_node node;
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 	struct ion_device *dev;
 	struct ion_heap *heap;
 	unsigned long flags;
@@ -73,6 +100,7 @@ struct ion_buffer {
 	int kmap_cnt;
 	void *vaddr;
 	int dmap_cnt;
+<<<<<<< HEAD
 	struct sg_table *sg_table;
 	unsigned long *dirty;
 	struct list_head vmas;
@@ -80,6 +108,9 @@ struct ion_buffer {
 	int handle_count;
 	char task_comm[TASK_COMM_LEN];
 	pid_t pid;
+=======
+	struct scatterlist *sglist;
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 };
 
 /**
@@ -101,7 +132,11 @@ struct ion_heap_ops {
 	void (*free) (struct ion_buffer *buffer);
 	int (*phys) (struct ion_heap *heap, struct ion_buffer *buffer,
 		     ion_phys_addr_t *addr, size_t *len);
+<<<<<<< HEAD
 	struct sg_table *(*map_dma) (struct ion_heap *heap,
+=======
+	struct scatterlist *(*map_dma) (struct ion_heap *heap,
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 					struct ion_buffer *buffer);
 	void (*unmap_dma) (struct ion_heap *heap, struct ion_buffer *buffer);
 	void * (*map_kernel) (struct ion_heap *heap, struct ion_buffer *buffer);
@@ -111,27 +146,36 @@ struct ion_heap_ops {
 };
 
 /**
+<<<<<<< HEAD
  * heap flags - flags between the heaps and core ion code
  */
 #define ION_HEAP_FLAG_DEFER_FREE (1 << 0)
 
 /**
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
  * struct ion_heap - represents a heap in the system
  * @node:		rb node to put the heap on the device's tree of heaps
  * @dev:		back pointer to the ion_device
  * @type:		type of heap
  * @ops:		ops struct as above
+<<<<<<< HEAD
  * @flags:		flags
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
  * @id:			id of heap, also indicates priority of this heap when
  *			allocating.  These are specified by platform data and
  *			MUST be unique
  * @name:		used for debugging
+<<<<<<< HEAD
  * @free_list:		free list head if deferred free is used
  * @lock:		protects the free list
  * @waitqueue:		queue to wait on from deferred free thread
  * @task:		task struct of deferred free thread
  * @debug_show:		called when heap debug file is read to add any
  *			heap specific debug info to output
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
  *
  * Represents a pool of memory from which buffers can be made.  In some
  * systems the only heap is regular system memory allocated via vmalloc.
@@ -139,6 +183,7 @@ struct ion_heap_ops {
  * that are allocated from a specially reserved heap.
  */
 struct ion_heap {
+<<<<<<< HEAD
 	struct plist_node node;
 	struct ion_device *dev;
 	enum ion_heap_type type;
@@ -171,6 +216,17 @@ bool ion_buffer_cached(struct ion_buffer *buffer);
 bool ion_buffer_fault_user_mappings(struct ion_buffer *buffer);
 
 /**
+=======
+	struct rb_node node;
+	struct ion_device *dev;
+	enum ion_heap_type type;
+	struct ion_heap_ops *ops;
+	int id;
+	const char *name;
+};
+
+/**
+>>>>>>> 321457a... 00032_drivers_gpu_ion
  * ion_device_create - allocates and returns an ion device
  * @custom_ioctl:	arch specific ioctl function if applicable
  *
@@ -195,6 +251,7 @@ void ion_device_destroy(struct ion_device *dev);
 void ion_device_add_heap(struct ion_device *dev, struct ion_heap *heap);
 
 /**
+<<<<<<< HEAD
  * some helpers for common operations on buffers using the sg_table
  * and vaddr fields
  */
@@ -206,6 +263,8 @@ int ion_heap_buffer_zero(struct ion_buffer *buffer);
 
 
 /**
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
  * functions for creating and destroying the built in ion heaps.
  * architectures can add their own custom architecture specific
  * heaps as appropriate.
@@ -213,6 +272,10 @@ int ion_heap_buffer_zero(struct ion_buffer *buffer);
 
 struct ion_heap *ion_heap_create(struct ion_platform_heap *);
 void ion_heap_destroy(struct ion_heap *);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 struct ion_heap *ion_system_heap_create(struct ion_platform_heap *);
 void ion_system_heap_destroy(struct ion_heap *);
 
@@ -221,9 +284,12 @@ void ion_system_contig_heap_destroy(struct ion_heap *);
 
 struct ion_heap *ion_carveout_heap_create(struct ion_platform_heap *);
 void ion_carveout_heap_destroy(struct ion_heap *);
+<<<<<<< HEAD
 
 struct ion_heap *ion_chunk_heap_create(struct ion_platform_heap *);
 void ion_chunk_heap_destroy(struct ion_heap *);
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 /**
  * kernel api to allocate/free from carveout -- used when carveout is
  * used to back an architecture specific custom heap
@@ -238,6 +304,7 @@ void ion_carveout_free(struct ion_heap *heap, ion_phys_addr_t addr,
  */
 #define ION_CARVEOUT_ALLOCATE_FAIL -1
 
+<<<<<<< HEAD
 /**
  * functions for creating and destroying a heap pool -- allows you
  * to keep a pool of pre allocated memory to use from your heap.  Keeping
@@ -285,4 +352,6 @@ void ion_page_pool_destroy(struct ion_page_pool *);
 void *ion_page_pool_alloc(struct ion_page_pool *);
 void ion_page_pool_free(struct ion_page_pool *, struct page *);
 
+=======
+>>>>>>> 321457a... 00032_drivers_gpu_ion
 #endif /* _ION_PRIV_H */
