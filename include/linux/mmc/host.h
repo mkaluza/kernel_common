@@ -212,6 +212,7 @@ struct mmc_host {
 #define MMC_CAP_SPI		(1 << 4)	/* Talks only SPI protocols */
 #define MMC_CAP_NEEDS_POLL	(1 << 5)	/* Needs polling for card-detection */
 #define MMC_CAP_8_BIT_DATA	(1 << 6)	/* Can the host do 8 bit transfers */
+#define MMC_CAP_DISABLE		(1 << 7)        /* Can the host be disabled */
 
 #define MMC_CAP_NONREMOVABLE	(1 << 8)	/* Nonremovable e.g. eMMC */
 #define MMC_CAP_WAIT_WHILE_BUSY	(1 << 9)	/* Waits while card is busy */
@@ -297,7 +298,13 @@ struct mmc_host {
 	unsigned int		removed:1;	/* host is being removed */
 #endif
 
-	int			rescan_disable;	/* disable card detection */
+	/* Only used with MMC_CAP_DISABLE */
+	int                     enabled;        /* host is enabled */
+	int                     rescan_disable; /* disable card detection */
+	int                     nesting_cnt;    /* "enable" nesting count */
+	int                     en_dis_recurs;  /* detect recursion */
+	unsigned int            disable_delay;  /* disable delay in msecs */
+	struct delayed_work     disable;        /* disabling work */
 
 	struct mmc_card		*card;		/* device attached to this host */
 

@@ -2223,7 +2223,7 @@ void mmc_rescan(struct work_struct *work)
 			mmc_release_host(host);
 			return;
 		}
-		if (!mmc_rescan_try_freq(host, max(freqs[i], host->f_min)))
+		if (!mmc_rescan_try_freq(host, max(freqs[i], host->f_min))) {
 			extend_wakelock = true;
 			break;
 		}

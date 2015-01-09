@@ -1,10 +1,7 @@
 menuconfig ION
 	tristate "Ion Memory Manager"
 	select GENERIC_ALLOCATOR
-<<<<<<< HEAD
 	select DMA_SHARED_BUFFER
-=======
->>>>>>> 321457a... 00032_drivers_gpu_ion
 	help
 	  Chose this option to enable the ION Memory Manager.
 

@@ -613,7 +613,7 @@ static struct attribute * g[] = {
 	&wake_lock_attr.attr,
 	&wake_unlock_attr.attr,
 #endif
-//FIXME #endif
+#endif
 #ifdef CONFIG_DVFS_LIMIT
 	&cpufreq_table_attr.attr,
 	&cpufreq_max_limit_attr.attr,

@@ -958,25 +958,6 @@ out_task:
 out_no_task:
 	return copied;
 }
-<<<<<<< HEAD
-
-static ssize_t mem_read(struct file *file, char __user *buf,
-			size_t count, loff_t *ppos)
-{
-	return mem_rw(file, buf, count, ppos, 0);
-}
-
-#define mem_write NULL
-
-#ifndef mem_write
-/* This is a security hazard */
-static ssize_t mem_write(struct file *file, const char __user *buf,
-			 size_t count, loff_t *ppos)
-{
-	return mem_rw(file, (char __user*)buf, count, ppos, 1);
-}
-=======
->>>>>>> 7dfb36c... fs_proc
 #endif
 
 loff_t mem_lseek(struct file *file, loff_t offset, int orig)

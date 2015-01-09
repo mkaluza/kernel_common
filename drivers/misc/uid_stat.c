@@ -120,6 +120,7 @@ static struct uid_stat *create_stat(uid_t uid) {
 	return new_uid;
 }
 
+/*
 static struct uid_stat *find_or_create_uid_stat(uid_t uid)
 {
 	struct uid_stat *entry;
@@ -136,7 +137,7 @@ static struct uid_stat *find_or_create_uid_stat(uid_t uid)
 		create_stat_proc(entry);
 	return entry;
 }
-
+*/
 int uid_stat_tcp_snd(uid_t uid, int size) {
 	struct uid_stat *entry;
 	activity_stats_update();
