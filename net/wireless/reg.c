@@ -2318,7 +2318,6 @@ void /* __init_or_exit */ regulatory_exit(void)
 
 	dev_set_uevent_suppress(&reg_pdev->dev, true);
 
-	last_request = NULL;
 	dev_set_uevent_suppress(&reg_pdev->dev, true);
 
 	platform_device_unregister(reg_pdev);
