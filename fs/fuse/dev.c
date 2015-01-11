@@ -288,7 +288,11 @@ void fuse_queue_forget(struct fuse_conn *fc, struct fuse_forget_link *forget,
 	if (fc->connected) {
 		fc->forget_list_tail->next = forget;
 		fc->forget_list_tail = forget;
+<<<<<<< ours
 		wake_up(&fc->waitq[is_rt(fc)]);
+=======
+		wake_up(&fc->waitq);
+>>>>>>> theirs
 		kill_fasync(&fc->fasync, SIGIO, POLL_IN);
 	} else {
 		kfree(forget);
