@@ -70,7 +70,6 @@
 #define BCMROMDAT_APATCH(data)
 #define BCMROMDAT_SPATCH(data)
 
-
 #define	SI_BUS			0	
 #define	PCI_BUS			1	
 #define	PCMCIA_BUS		2	
