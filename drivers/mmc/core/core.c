@@ -2494,6 +2494,7 @@ int mmc_suspend_host(struct mmc_host *host)
 			host->pm_state |= MMC_HOST_DEFERRED_RESUME |
 					  MMC_HOST_NEEDS_RESUME;
 		}
+		flush_delayed_work(&host->disable);
 	}
 	mmc_bus_put(host);
 
