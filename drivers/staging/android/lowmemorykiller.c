@@ -78,6 +78,7 @@ static uint32_t minimum_interval_time = MIN_CSWAP_INTERVAL;
 #ifdef ENHANCED_LMK_ROUTINE
 #define LOWMEM_DEATHPENDING_DEPTH 3
 #endif
+#include <linux/profile.h>
 
 static uint32_t lowmem_debug_level = 2;
 static int lowmem_adj[6] = {
@@ -95,12 +96,16 @@ static size_t lowmem_minfree[6] = {
 };
 static int lowmem_minfree_size = 4;
 
+<<<<<<< ours
 #ifdef ENHANCED_LMK_ROUTINE
 static struct task_struct *lowmem_deathpending[LOWMEM_DEATHPENDING_DEPTH] = {NULL,};
 #else
 static struct task_struct *lowmem_deathpending;
 #endif
 static unsigned long lowmem_deathpending_timeout;
+=======
+static struct task_struct *lowmem_deathpending;
+>>>>>>> theirs
 
 #define lowmem_print(level, x...)			\
 	do {						\
@@ -119,6 +124,7 @@ static int
 task_notify_func(struct notifier_block *self, unsigned long val, void *data)
 {
 	struct task_struct *task = data;
+<<<<<<< ours
 
 #ifdef ENHANCED_LMK_ROUTINE
 	int i = 0;
@@ -135,6 +141,16 @@ task_notify_func(struct notifier_block *self, unsigned long val, void *data)
 }
 
 static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
+=======
+	if (task == lowmem_deathpending) {
+		lowmem_deathpending = NULL;
+		task_handoff_unregister(&task_nb);
+	}
+	return NOTIFY_OK;
+}
+
+static int lowmem_shrink(int nr_to_scan, gfp_t gfp_mask)
+>>>>>>> theirs
 {
 	struct task_struct *p;
 #ifdef ENHANCED_LMK_ROUTINE
@@ -182,6 +198,18 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	    time_before_eq(jiffies, lowmem_deathpending_timeout))
 		return 0;
 #endif
+
+	/*
+	 * If we already have a death outstanding, then
+	 * bail out right away; indicating to vmscan
+	 * that we have nothing further to offer on
+	 * this pass.
+	 *
+	 * Note: Currently you need CONFIG_PROFILING
+	 * for this to work correctly.
+	 */
+	if (lowmem_deathpending)
+		return 0;
 
 	if (lowmem_adj_size < array_size)
 		array_size = lowmem_adj_size;
@@ -317,8 +345,20 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		lowmem_print(1, "send sigkill to %d (%s), adj %d, size %d\n",
 			     selected->pid, selected->comm,
 			     selected_oom_adj, selected_tasksize);
+<<<<<<< ours
 		lowmem_deathpending = selected;
 		lowmem_deathpending_timeout = jiffies + HZ;
+=======
+		/*
+		 * If CONFIG_PROFILING is off, then task_handoff_register()
+		 * is a nop. In that case we don't want to stall the killer
+		 * by setting lowmem_deathpending.
+		 */
+#ifdef CONFIG_PROFILING
+		lowmem_deathpending = selected;
+		task_handoff_register(&task_nb);
+#endif
+>>>>>>> theirs
 		force_sig(SIGKILL, selected);
 		rem -= selected_tasksize;
 	}
