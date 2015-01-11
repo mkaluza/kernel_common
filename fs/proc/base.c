@@ -793,13 +793,11 @@ static int mem_open(struct inode* inode, struct file* file)
 	return 0;
 }
 
-static ssize_t mem_read(struct file * file, char __user * buf,
-			size_t count, loff_t *ppos)
+static ssize_t mem_rw(struct file *file, char __user *buf,
+			size_t count, loff_t *ppos, int write)
 {
-	int ret;
-	char *page;
-	unsigned long src = *ppos;
 	struct mm_struct *mm = file->private_data;
+<<<<<<< ours
 
 	if (!mm)
 		return 0;
@@ -845,9 +843,11 @@ static ssize_t mem_write(struct file * file, const char __user *buf,
 			 size_t count, loff_t *ppos)
 {
 	int copied;
+=======
+	unsigned long addr = *ppos;
+	ssize_t copied;
+>>>>>>> theirs
 	char *page;
-	unsigned long dst = *ppos;
-	struct mm_struct *mm = file->private_data;
 
 	if (!mm)
 		return 0;
@@ -858,30 +858,48 @@ static ssize_t mem_write(struct file * file, const char __user *buf,
 
 	copied = 0;
 	while (count > 0) {
-		int this_len, retval;
+		int this_len = min_t(int, count, PAGE_SIZE);
 
-		this_len = (count > PAGE_SIZE) ? PAGE_SIZE : count;
-		if (copy_from_user(page, buf, this_len)) {
+		if (write && copy_from_user(page, buf, this_len)) {
 			copied = -EFAULT;
 			break;
 		}
-		retval = access_remote_vm(mm, dst, page, this_len, 1);
-		if (!retval) {
+
+		this_len = access_remote_vm(mm, addr, page, this_len, write);
+		if (!this_len) {
 			if (!copied)
 				copied = -EIO;
 			break;
 		}
-		copied += retval;
-		buf += retval;
-		dst += retval;
-		count -= retval;			
+
+		if (!write && copy_to_user(buf, page, this_len)) {
+			copied = -EFAULT;
+			break;
+		}
+
+		buf += this_len;
+		addr += this_len;
+		copied += this_len;
+		count -= this_len;
 	}
-	*ppos = dst;
+	*ppos = addr;
 
 	free_page((unsigned long) page);
 	return copied;
 }
 #endif
+
+static ssize_t mem_read(struct file *file, char __user *buf,
+			size_t count, loff_t *ppos)
+{
+	return mem_rw(file, buf, count, ppos, 0);
+}
+
+static ssize_t mem_write(struct file *file, const char __user *buf,
+			 size_t count, loff_t *ppos)
+{
+	return mem_rw(file, (char __user*)buf, count, ppos, 1);
+}
 
 loff_t mem_lseek(struct file *file, loff_t offset, int orig)
 {
