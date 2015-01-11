@@ -178,7 +178,7 @@ typedef struct {
 #if defined(BCM_RPC_NOCOPY) || defined(BCM_RCP_TXNOCOPY)
 
 #define BCMEXTRAHDROOM 220
-#else 
+#else
 #define BCMEXTRAHDROOM 172
 #endif 
 
