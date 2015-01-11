@@ -211,12 +211,8 @@ static struct mm_struct *mm_access(struct task_struct *task, unsigned int mode)
 
 	mm = get_task_mm(task);
 	if (mm && mm != current->mm &&
-<<<<<<< ours
-			!ptrace_may_access(task, PTRACE_MODE_READ) &&
+			!ptrace_may_access(task, mode) &&
 			!capable(CAP_SYS_RESOURCE)) {
-=======
-			!ptrace_may_access(task, mode)) {
->>>>>>> theirs
 		mmput(mm);
 		mm = ERR_PTR(-EACCES);
 	}
@@ -804,56 +800,8 @@ static ssize_t mem_rw(struct file *file, char __user *buf,
 			size_t count, loff_t *ppos, int write)
 {
 	struct mm_struct *mm = file->private_data;
-<<<<<<< ours
-
-	if (!mm)
-		return 0;
-
-	page = (char *)__get_free_page(GFP_TEMPORARY);
-	if (!page)
-		return -ENOMEM;
-
-	ret = 0;
- 
-	while (count > 0) {
-		int this_len, retval;
-
-		this_len = (count > PAGE_SIZE) ? PAGE_SIZE : count;
-		retval = access_remote_vm(mm, src, page, this_len, 0);
-		if (!retval) {
-			if (!ret)
-				ret = -EIO;
-			break;
-		}
-
-		if (copy_to_user(buf, page, retval)) {
-			ret = -EFAULT;
-			break;
-		}
- 
-		ret += retval;
-		src += retval;
-		buf += retval;
-		count -= retval;
-	}
-	*ppos = src;
-
-	free_page((unsigned long) page);
-	return ret;
-}
-
-#define mem_write NULL
-
-#ifndef mem_write
-/* This is a security hazard */
-static ssize_t mem_write(struct file * file, const char __user *buf,
-			 size_t count, loff_t *ppos)
-{
-	int copied;
-=======
 	unsigned long addr = *ppos;
 	ssize_t copied;
->>>>>>> theirs
 	char *page;
 
 	if (!mm)
