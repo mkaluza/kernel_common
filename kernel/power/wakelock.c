@@ -47,8 +47,6 @@ module_param_named(debug_mask, debug_mask, int, S_IRUGO | S_IWUSR | S_IWGRP);
 #define WAKE_LOCK_AUTO_EXPIRE            (1U << 10)
 #define WAKE_LOCK_PREVENTING_SUSPEND     (1U << 11)
 
-#define TOO_MAY_LOCKS_WARNING		"\n\ntoo many wakelocks!!!\n"
-
 static DEFINE_SPINLOCK(list_lock);
 static LIST_HEAD(inactive_locks);
 static struct list_head active_wake_locks[WAKE_LOCK_TYPE_COUNT];
@@ -127,7 +125,6 @@ static int print_lock_stat(struct seq_file *m, struct wake_lock *lock)
 		     ktime_to_ns(total_time),
 		     ktime_to_ns(prevent_suspend_time), ktime_to_ns(max_time),
 		     ktime_to_ns(lock->stat.last_time));
-
 }
 
 static int wakelock_stats_show(struct seq_file *m, void *unused)
