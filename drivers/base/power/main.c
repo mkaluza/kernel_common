@@ -512,6 +512,7 @@ static int legacy_resume(struct device *dev, int (*cb)(struct device *dev))
 static int device_resume(struct device *dev, pm_message_t state, bool async)
 {
 	int error = 0;
+	bool put = false;
 
 	TRACE_DEVICE(dev);
 	TRACE_RESUME(0);
@@ -570,6 +571,10 @@ static int device_resume(struct device *dev, pm_message_t state, bool async)
 	complete_all(&dev->power.completion);
 
 	TRACE_RESUME(error);
+
+	if (put)
+		pm_runtime_put_sync(dev);
+
 	return error;
 }
 
@@ -877,6 +882,7 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 
 	dpm_wait_for_children(dev, async);
 
+//FIXME STAR
 	data.dev = dev;
 	data.tsk = get_current();
 	init_timer_on_stack(&timer);
@@ -885,15 +891,28 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 	timer.data = (unsigned long)&data;
 	add_timer(&timer);
 
-	device_lock(dev);
+	if (async_error) {
+		del_timer_sync(&timer);
+		destroy_timer_on_stack(&timer);
+		return 0;
+	}
 
+	pm_runtime_get_noresume(dev);
+	if (pm_runtime_barrier(dev) && device_may_wakeup(dev))
+		pm_wakeup_event(dev, 0);
+//FIXME END
 	if (async_error)
 		goto Unlock;
 
 	if (pm_wakeup_pending()) {
+		del_timer_sync(&timer);
+		destroy_timer_on_stack(&timer);
+		pm_runtime_put_sync(dev);
 		async_error = -EBUSY;
 		goto Unlock;
 	}
+
+	device_lock(dev);
 
 	if (dev->pwr_domain) {
 		pm_dev_dbg(dev, state, "power domain ");
@@ -940,8 +959,12 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 
 	complete_all(&dev->power.completion);
 
-	if (error)
+	if (error) {
+		pm_runtime_put_sync(dev);
 		async_error = error;
+	} else if (dev->power.is_suspended) {
+		__pm_runtime_disable(dev, false);
+	}
 
 	return error;
 }
@@ -1081,13 +1104,7 @@ int dpm_prepare(pm_message_t state)
 		get_device(dev);
 		mutex_unlock(&dpm_list_mtx);
 
-		pm_runtime_get_noresume(dev);
-		if (pm_runtime_barrier(dev) && device_may_wakeup(dev))
-			pm_wakeup_event(dev, 0);
-
-		pm_runtime_put_sync(dev);
-		error = pm_wakeup_pending() ?
-				-EBUSY : device_prepare(dev, state);
+		error = device_prepare(dev, state);
 
 		mutex_lock(&dpm_list_mtx);
 		if (error) {
