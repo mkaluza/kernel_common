@@ -199,8 +199,6 @@ typedef struct {
 # undef BCMASSERT_LOG
 #endif
 
-#if defined(BCMASSERT_LOG)
-#define BCMASSERT_SUPPORT
 #endif 
 
 
