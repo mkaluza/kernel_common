@@ -65,6 +65,7 @@ static int async_error;
 void device_pm_init(struct device *dev)
 {
 	dev->power.is_prepared = false;
+	dev->power.is_suspended = false;
 	init_completion(&dev->power.completion);
 	complete_all(&dev->power.completion);
 	dev->power.wakeup = NULL;
@@ -525,6 +526,9 @@ static int device_resume(struct device *dev, pm_message_t state, bool async)
 	 */
 	dev->power.is_prepared = false;
 
+	if (!dev->power.is_suspended)
+		goto Unlock;
+
 	if (dev->pwr_domain) {
 		pm_dev_dbg(dev, state, "power domain ");
 		error = pm_op(dev, &dev->pwr_domain->ops, state);
@@ -878,14 +882,7 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 
 	dpm_wait_for_children(dev, async);
 
-	data.dev = dev;
-	data.tsk = get_current();
-	init_timer_on_stack(&timer);
-	timer.expires = jiffies + HZ * 12;
-	timer.function = dpm_drv_timeout;
-	timer.data = (unsigned long)&data;
-	add_timer(&timer);
-
+//FIXME START
 	data.dev = dev;
 	data.tsk = get_current();
 	init_timer_on_stack(&timer);
@@ -903,13 +900,16 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
 	pm_runtime_get_noresume(dev);
 	if (pm_runtime_barrier(dev) && device_may_wakeup(dev))
 		pm_wakeup_event(dev, 0);
+//FIXME END
+	if (async_error)
+		goto Unlock;
 
 	if (pm_wakeup_pending()) {
 		del_timer_sync(&timer);
 		destroy_timer_on_stack(&timer);
 		pm_runtime_put_sync(dev);
 		async_error = -EBUSY;
-		return 0;
+		goto Unlock;
 	}
 
 	device_lock(dev);
@@ -951,6 +951,7 @@ static int __device_suspend(struct device *dev, pm_message_t state, bool async)
  End:
 	dev->power.is_suspended = !error;
 
+ Unlock:
 	device_unlock(dev);
 
 	del_timer_sync(&timer);
