@@ -168,6 +168,9 @@ config SYS_HYPERVISOR
 	bool
 	default n
 
+config SYS_SOC
+	bool
+
 config SYNC
 	bool "Synchronization framework"
 	default n
