@@ -34,10 +34,6 @@
 #include <linux/android_aid.h>
 #endif
 
-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
-#include <linux/android_aid.h>
-#endif
-
 /*
  * If a non-root user executes a setuid-root binary in
  * !secure(SECURE_NOROOT) mode, then we raise capabilities.
