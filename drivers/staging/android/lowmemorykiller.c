@@ -191,7 +191,8 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	 * this pass.
 	 *
 	 */
-	if (lowmem_deathpending)
+	if (lowmem_deathpending &&
+	    time_before_eq(jiffies, lowmem_deathpending_timeout))
 		return 0;
 
 	if (lowmem_adj_size < array_size)
