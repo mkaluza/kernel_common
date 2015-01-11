@@ -22,6 +22,7 @@ extern int mmc_is_available;
 #include <linux/leds.h>
 #include <linux/sched.h>
 #include <linux/fault-inject.h>
+#include <linux/wakelock.h>
 
 #include <linux/mmc/core.h>
 #include <linux/mmc/pm.h>
@@ -305,6 +306,7 @@ struct mmc_host {
 	int			claim_cnt;	/* "claim" nesting count */
 
 	struct delayed_work	detect;
+	struct wake_lock	detect_wake_lock;
 
 	struct delayed_work	resume;		/* deferred resume work */
 	int			detect_change;	/* card detect flag */
