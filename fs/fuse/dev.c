@@ -19,11 +19,8 @@
 #include <linux/pipe_fs_i.h>
 #include <linux/swap.h>
 #include <linux/splice.h>
-<<<<<<< ours
-=======
 #include <linux/iocontext.h>
 #include <linux/ioprio.h>
->>>>>>> theirs
 #include <linux/freezer.h>
 
 MODULE_ALIAS_MISCDEV(FUSE_MINOR);
@@ -291,11 +288,7 @@ void fuse_queue_forget(struct fuse_conn *fc, struct fuse_forget_link *forget,
 	if (fc->connected) {
 		fc->forget_list_tail->next = forget;
 		fc->forget_list_tail = forget;
-<<<<<<< ours
 		wake_up(&fc->waitq[is_rt(fc)]);
-=======
-		wake_up(&fc->waitq);
->>>>>>> theirs
 		kill_fasync(&fc->fasync, SIGIO, POLL_IN);
 	} else {
 		kfree(forget);
