@@ -401,8 +401,10 @@ static int rpm_suspend(struct device *dev, int rpmflags)
 			 * reschedule another autosuspend.
 			 */
 			if ((rpmflags & RPM_AUTO) &&
-			    pm_runtime_autosuspend_expiration(dev) != 0)
+			    pm_runtime_autosuspend_expiration(dev) != 0) {
+				wake_up_all(&dev->power.wait_queue);
 				goto repeat;
+			}
 		} else {
 			pm_runtime_cancel_pending(dev);
 		}
@@ -1184,6 +1186,8 @@ static void update_autosuspend(struct device *dev, int old_delay, int old_use)
 void pm_runtime_set_autosuspend_delay(struct device *dev, int delay)
 {
 	int old_delay, old_use;
+
+	might_sleep();
 
 	spin_lock_irq(&dev->power.lock);
 	old_delay = dev->power.autosuspend_delay;
