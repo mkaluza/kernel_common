@@ -319,6 +319,7 @@ struct _mmc_csd {
 #define EXT_CSD_TAG_UNIT_SIZE		498	/* RO */
 #define EXT_CSD_DATA_TAG_SUPPORT	499	/* RO */
 #define EXT_CSD_HPI_FEATURES		503	/* RO */
+#define EXT_CSD_BOOT_SIZE_MULTI		226	/* RO */
 
 /*
  * EXT_CSD field definitions
