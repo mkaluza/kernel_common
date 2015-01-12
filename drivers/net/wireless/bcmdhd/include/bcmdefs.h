@@ -70,6 +70,7 @@
 #define BCMROMDAT_APATCH(data)
 #define BCMROMDAT_SPATCH(data)
 
+
 #define	SI_BUS			0	
 #define	PCI_BUS			1	
 #define	PCMCIA_BUS		2	
@@ -177,7 +178,7 @@ typedef struct {
 #if defined(BCM_RPC_NOCOPY) || defined(BCM_RCP_TXNOCOPY)
 
 #define BCMEXTRAHDROOM 220
-#else
+#else 
 #define BCMEXTRAHDROOM 172
 #endif 
 
@@ -198,6 +199,8 @@ typedef struct {
 # undef BCMASSERT_LOG
 #endif
 
+#if defined(BCMASSERT_LOG)
+#define BCMASSERT_SUPPORT
 #endif 
 
 
